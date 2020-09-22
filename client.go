@@ -20,7 +20,7 @@ type Message struct {
 	Message []byte
 }
 
-type client struct {
+type Client struct {
 	conn *websocket.Conn
 
 	wsUrl  *url.URL
@@ -32,12 +32,12 @@ type client struct {
 	OnReceive func(msg *Message)
 }
 
-func New(rawUrl string) (*client, error) {
+func New(rawUrl string) (*Client, error) {
 
 	return NewWithHeader(rawUrl, nil)
 }
 
-func NewWithHeader(rawUrl string, header *http.Header) (*client, error) {
+func NewWithHeader(rawUrl string, header *http.Header) (*Client, error) {
 
 	wsUrl, err := url.Parse(rawUrl)
 
@@ -45,7 +45,7 @@ func NewWithHeader(rawUrl string, header *http.Header) (*client, error) {
 		return nil, err
 	}
 
-	c := &client{
+	c := &Client{
 		header: header,
 		wsUrl:  wsUrl,
 		sendCh: make(chan *Message),
@@ -54,20 +54,20 @@ func NewWithHeader(rawUrl string, header *http.Header) (*client, error) {
 	return c, nil
 }
 
-func (c *client) reconnect() {
+func (c *Client) reconnect() {
 
 	c.Close()
 	c.Connect()
 }
 
-func (c *client) Close() {
+func (c *Client) Close() {
 
 	if c.conn != nil {
 		c.conn.Close()
 	}
 
 }
-func (c *client) Connect() {
+func (c *Client) Connect() {
 
 	var header http.Header
 
@@ -99,13 +99,13 @@ func (c *client) Connect() {
 
 }
 
-func (c *client) WriteMessage(msg *Message) {
+func (c *Client) WriteMessage(msg *Message) {
 
 	c.sendCh <- msg
 
 }
 
-func (c *client) handleWrite() {
+func (c *Client) handleWrite() {
 
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -144,14 +144,14 @@ func (c *client) handleWrite() {
 	}
 }
 
-func (c *client) start() {
+func (c *Client) start() {
 
 	go c.loopRead()
 	go c.handleWrite()
 
 }
 
-func (c *client) loopRead() {
+func (c *Client) loopRead() {
 	c.conn.SetPongHandler(func(string) error {
 		c.conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
