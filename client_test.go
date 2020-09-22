@@ -30,7 +30,7 @@ func TestNew(t *testing.T) {
 
 	}
 
-	go client.connect()
+	go client.Connect()
 
 	time.Sleep(time.Second * 20)
 }

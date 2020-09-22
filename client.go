@@ -57,7 +57,7 @@ func NewWithHeader(rawUrl string, header *http.Header) (*client, error) {
 func (c *client) reconnect() {
 
 	c.Close()
-	c.connect()
+	c.Connect()
 }
 
 func (c *client) Close() {
@@ -67,7 +67,7 @@ func (c *client) Close() {
 	}
 
 }
-func (c *client) connect() {
+func (c *client) Connect() {
 
 	var header http.Header
 
@@ -89,13 +89,13 @@ func (c *client) connect() {
 		return
 	}
 
-	log.Println("Could not connect:", err.Error())
+	log.Println("Could not Connect:", err.Error())
 
 	after := time.After(time.Second * 2)
 
 	<-after
 
-	c.connect()
+	c.Connect()
 
 }
 
