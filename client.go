@@ -89,7 +89,7 @@ func (c *client) Connect() {
 		return
 	}
 
-	log.Println("Could not Connect:", err.Error())
+	log.Println("Could not connect to Server:", err.Error())
 
 	after := time.After(time.Second * 2)
 
